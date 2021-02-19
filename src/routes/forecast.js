@@ -1,6 +1,7 @@
 const express = require('express')
 const request = require('request')
 const router = express.Router()
+const port = 3000
 
 const weatherUrl = [
     'https://api.openweathermap.org/data/2.5/onecall?lat=',
@@ -14,6 +15,22 @@ router.get('/:lat/:lon', (req, res) => {
             console.log(error)
         } else {
             res.send(response.body.current)
+        }
+    })
+})
+
+router.get('/:place', (req, res) => {
+    request({ url: `http://localhost:${port}/geo/${req.params.place}`, json: true }, (error, geoResponse) => {
+        if (error) {
+            console.log(error)
+        } else {
+            request({ url: `http://localhost:${port}/forecast/${geoResponse.body.latitude}/${geoResponse.body.longitude}`, json: true }, (error, response) => {
+                if (error) {
+                    console.log(error)
+                } else {
+                    res.send(response.body)
+                }
+            })
         }
     })
 })
