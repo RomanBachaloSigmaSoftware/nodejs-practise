@@ -22,19 +22,22 @@ router.get('/:lat/:lon', (req, res) => {
 })
 
 router.get('/:place', (req, res) => {
-    request({ url: `http://localhost:${port}/geo/${req.params.place}`, json: true }, (error, geoResponse) => {
-        if (error) {
-            logService.log({ message: error, code: constants.codes.error })
-        } else {
-            request({ url: `http://localhost:${port}/forecast/${geoResponse.body.latitude}/${geoResponse.body.longitude}`, json: true }, (error, response) => {
-                if (error) {
-                    logService.log({ message: error, code: constants.codes.error })
-                } else {
-                    res.send(response.body)
-                }
-            })
-        }
-    })
+    request({ url: `http://localhost:${port}/geo/${req.params.place}`, json: true }, (error, response) => forecastCallback(error, response, res))
 })
+
+const forecastCallback = (error, response, res) => {
+    if (error) {
+        logService.log({ message: error, code: constants.codes.error })
+    } else {
+        request({ url: `http://localhost:${port}/forecast/${response.body.latitude}/${response.body.longitude}`, json: true }, (error, response) => {
+            if (error) {
+                logService.log({ message: error, code: constants.codes.error })
+            } else {
+                logService.log({ message: JSON.stringify(response.body), code: constants.codes.success })
+                res.send(response.body);
+            }
+        })
+    }
+}
 
 module.exports = router
