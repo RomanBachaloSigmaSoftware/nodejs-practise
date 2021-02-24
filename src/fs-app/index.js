@@ -1,10 +1,10 @@
-const request = require('request')
-const yargs = require('yargs')
-const constants = require('../data/constants')
-const logService = require('../log-service/logService')
+const request = require('request');
+const yargs = require('yargs');
+const constants = require('../data/constants');
+const logService = require('../log-service/logService');
 
-const port = constants.port
-const baseUrl = `http://localhost:${port}/fs/`
+const port = constants.port;
+const baseUrl = `http://localhost:${port}/fs/`;
 
 yargs.command({
     command: 'get',
@@ -15,18 +15,18 @@ yargs.command({
         }
     },
     handler: function(argv) {
-        let url = baseUrl + argv.name
+        let url = baseUrl + argv.name;
         request({ url: url }, (err, res) => {
             if (err) {
-                logService.log({ message: err, code: constants.codes.error })
+                logService.log({ message: err, code: constants.codes.error });
             } else if (res.statusCode >= constants.codes.error) {
-                logService.log({ message: res.body, code: constants.codes.error })
+                logService.log({ message: res.body, code: constants.codes.error });
             } else {
-                logService.log({ message: res.body, code: constants.codes.success })
+                logService.log({ message: res.body, code: constants.codes.success });
             }
-        })
+        });
     }
-})
+});
 
 yargs.command({
     command: 'delete',
@@ -37,18 +37,18 @@ yargs.command({
         }
     },
     handler: function(argv) {
-        let url = baseUrl + argv.name
+        let url = baseUrl + argv.name;
         request.delete({ url: url }, (err, res) => {
             if (err) {
-                logService.log({ message: err, code: constants.codes.error })
+                logService.log({ message: err, code: constants.codes.error });
             } else if (res.statusCode >= constants.codes.error) {
-                logService.log({ message: res.body, code: constants.codes.error })
+                logService.log({ message: res.body, code: constants.codes.error });
             } else {
-                logService.log({ message: res.body, code: constants.codes.success })
+                logService.log({ message: res.body, code: constants.codes.success });
             }
-        })
+        });
     }
-})
+});
 
 yargs.command({
     command: 'create',
@@ -69,15 +69,15 @@ yargs.command({
     handler: function(argv) {
         request.post({ url: baseUrl, body: argv, json: true }, (err, res) => {
             if (err) {
-                logService.log({ message: err, code: constants.codes.error })
+                logService.log({ message: err, code: constants.codes.error });
             } else if (res.statusCode >= constants.codes.error) {
-                logService.log({ message: res.body, code: constants.codes.error })
+                logService.log({ message: res.body, code: constants.codes.error });
             } else {
-                logService.log({ message: res.body, code: constants.codes.success })
+                logService.log({ message: res.body, code: constants.codes.success });
             }
-        })
+        });
     }
-})
+});
 
 yargs.command({
     command: 'update',
@@ -98,14 +98,14 @@ yargs.command({
     handler: function(argv) {
         request.put({ url: baseUrl, body: argv, json: true }, (err, res) => {
             if (err) {
-                logService.log({ message: err, code: constants.codes.error })
+                logService.log({ message: err, code: constants.codes.error });
             } else if (res.statusCode >= constants.codes.error) {
-                logService.log({ message: res.body, code: constants.codes.error })
+                logService.log({ message: res.body, code: constants.codes.error });
             } else {
-                logService.log({ message: res.body, code: constants.codes.success })
+                logService.log({ message: res.body, code: constants.codes.success });
             }
-        })
+        });
     }
-})
+});
 
-yargs.parse()
+yargs.parse();
