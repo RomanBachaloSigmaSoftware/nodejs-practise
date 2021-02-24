@@ -2,12 +2,16 @@ const express = require('express')
 const fsRoute = require('./fs')
 const geocodeRoute = require('./geocode')
 const forecastRoute = require('./forecast')
+const bodyParser = require('body-parser')
+const constants = require('../data/constants')
 
 const app = express()
-const port = 3000
+const port = constants.port
 
-app.use('/fs', express.raw({ type: "application/json" }), fsRoute)
-app.use('/geo', express.raw({ type: "application/json" }), geocodeRoute)
-app.use('/forecast', express.raw({ type: "application/json" }), forecastRoute)
+app.use(bodyParser.json({ limit: '64kb' })); // for parsing application/json
+
+app.use('/fs', fsRoute)
+app.use('/geo', geocodeRoute)
+app.use('/forecast', forecastRoute)
 
 app.listen(port)

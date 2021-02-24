@@ -1,7 +1,9 @@
 const express = require('express')
 const request = require('request')
 const router = express.Router()
-const port = 3000
+const constants = require('../data/constants')
+const logService = require('../log-service/logService')
+const port = constants.port
 
 const weatherUrl = [
     'https://api.openweathermap.org/data/2.5/onecall?lat=',
@@ -10,9 +12,9 @@ const weatherUrl = [
 ]
 
 router.get('/:lat/:lon', (req, res) => {
-    request({ url: weatherUrl[0] + req.params.lat + weatherUrl[1] + req.params.lon + weatherUrl[2], json: true }, (error, response) => {
+    request({ url: `${weatherUrl[0]}${req.params.lat}${weatherUrl[1]}${req.params.lon}${weatherUrl[2]}`, json: true }, (error, response) => {
         if (error) {
-            console.log(error)
+            logService.log({ message: error, code: constants.codes.error })
         } else {
             res.send(response.body.current)
         }
@@ -22,11 +24,11 @@ router.get('/:lat/:lon', (req, res) => {
 router.get('/:place', (req, res) => {
     request({ url: `http://localhost:${port}/geo/${req.params.place}`, json: true }, (error, geoResponse) => {
         if (error) {
-            console.log(error)
+            logService.log({ message: error, code: constants.codes.error })
         } else {
             request({ url: `http://localhost:${port}/forecast/${geoResponse.body.latitude}/${geoResponse.body.longitude}`, json: true }, (error, response) => {
                 if (error) {
-                    console.log(error)
+                    logService.log({ message: error, code: constants.codes.error })
                 } else {
                     res.send(response.body)
                 }

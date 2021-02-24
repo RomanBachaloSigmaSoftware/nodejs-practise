@@ -1,8 +1,9 @@
-const chalk = require('chalk')
 const request = require('request')
 const yargs = require('yargs')
+const constants = require('../data/constants')
+const logService = require('../log-service/logService')
 
-const port = 3000
+const port = constants.port
 const baseUrl = `http://localhost:${port}/fs/`
 
 yargs.command({
@@ -17,11 +18,11 @@ yargs.command({
         let url = baseUrl + argv.name
         request({ url: url }, (err, res) => {
             if (err) {
-                console.log(chalk.red(err))
-            } else if (res.statusCode >= 400) {
-                console.log(chalk.red(res.body))
+                logService.log({ message: err, code: constants.codes.error })
+            } else if (res.statusCode >= constants.codes.error) {
+                logService.log({ message: res.body, code: constants.codes.error })
             } else {
-                console.log(chalk.green(res.body))
+                logService.log({ message: res.body, code: constants.codes.success })
             }
         })
     }
@@ -39,11 +40,11 @@ yargs.command({
         let url = baseUrl + argv.name
         request.delete({ url: url }, (err, res) => {
             if (err) {
-                console.log(chalk.red(err))
-            } else if (res.statusCode >= 400) {
-                console.log(chalk.red(res.body))
+                logService.log({ message: err, code: constants.codes.error })
+            } else if (res.statusCode >= constants.codes.error) {
+                logService.log({ message: res.body, code: constants.codes.error })
             } else {
-                console.log(chalk.green(res.body))
+                logService.log({ message: res.body, code: constants.codes.success })
             }
         })
     }
@@ -68,11 +69,11 @@ yargs.command({
     handler: function(argv) {
         request.post({ url: baseUrl, body: argv, json: true }, (err, res) => {
             if (err) {
-                console.log(chalk.red(err))
-            } else if (res.statusCode >= 400) {
-                console.log(chalk.red(res.body))
+                logService.log({ message: err, code: constants.codes.error })
+            } else if (res.statusCode >= constants.codes.error) {
+                logService.log({ message: res.body, code: constants.codes.error })
             } else {
-                console.log(chalk.green(res.body))
+                logService.log({ message: res.body, code: constants.codes.success })
             }
         })
     }
@@ -95,14 +96,13 @@ yargs.command({
         }
     },
     handler: function(argv) {
-        let url = baseUrl
         request.put({ url: baseUrl, body: argv, json: true }, (err, res) => {
             if (err) {
-                console.log(chalk.red(err))
-            } else if (res.statusCode >= 400) {
-                console.log(chalk.red(res.body))
+                logService.log({ message: err, code: constants.codes.error })
+            } else if (res.statusCode >= constants.codes.error) {
+                logService.log({ message: res.body, code: constants.codes.error })
             } else {
-                console.log(chalk.green(res.body))
+                logService.log({ message: res.body, code: constants.codes.success })
             }
         })
     }

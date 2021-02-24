@@ -1,13 +1,14 @@
 const express = require('express')
 const fs = require('fs')
 const router = express.Router()
+const constants = require('../data/constants')
 
 router.delete('/:fileName', (req, res) => {
     fs.exists(req.params.fileName, exists => {
         if (exists) {
             fs.unlink(req.params.fileName, err => {
                 if (err) {
-                    res.statusCode = 400
+                    res.statusCode = constants.codes.error
                     res.send(`Unable to delete ${req.params.fileName}`)
                     console.error(err)
                     return
@@ -16,18 +17,18 @@ router.delete('/:fileName', (req, res) => {
                 }
             })
         } else {
-            res.statusCode = 400
+            res.statusCode = constants.codes.error
             res.send(`${req.params.fileName} does not exist`)
         }
     })
 })
 
 router.post('/', (req, res) => {
-    let documentValues = JSON.parse(req.body)
+    let documentValues = req.body
     let file = `${documentValues.fileName}.${documentValues.fileExtension}`
     fs.exists(file, exists => {
         if (exists) {
-            res.statusCode = 400
+            res.statusCode = constants.codes.error
             res.send(`${file} already exists`)
 
         } else {
@@ -40,7 +41,7 @@ router.post('/', (req, res) => {
 })
 
 router.put('/', (req, res) => {
-    let documentValues = JSON.parse(req.body)
+    let documentValues = req.body
     let file = `${documentValues.fileName}.${documentValues.fileExtension}`
     fs.exists(file, exists => {
         if (exists) {
@@ -50,7 +51,7 @@ router.put('/', (req, res) => {
             })
 
         } else {
-            res.statusCode = 400
+            res.statusCode = constants.codes.error
             res.send(`${file} does not exist`)
         }
     })
@@ -64,7 +65,7 @@ router.get('/:fileName', (req, res) => {
                 res.send(data);
             })
         } else {
-            res.statusCode = 400
+            res.statusCode = constants.codes.error
             res.send(`${req.params.fileName} does not exist`)
         }
     })

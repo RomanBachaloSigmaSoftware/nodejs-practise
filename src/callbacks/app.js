@@ -1,4 +1,7 @@
 const request = require('request')
+const constants = require('../data/constants')
+const logService = require('../log-service/logService')
+
 const weatherUrl = [
     'https://api.openweathermap.org/data/2.5/onecall?lat=',
     '&lon=',
@@ -11,29 +14,37 @@ const mapboxUrl = [
 ]
 
 // gets the coordinates by given address and calls a callback function
-const weatherForecast = (address, callback) => {
-    request({ url: mapboxUrl[0] + address + mapboxUrl[1], json: true }, (err, res) => {
-        if (err) {
-            console.log(err)
-        } else {
-            const place = {
-                longitude: res.body.features[0].center[0],
-                latitude: res.body.features[0].center[1]
+const weatherForecast = (mapUrl, forecastUrl, address, callback) => {
+    if (!(mapUrl && mapUrl[0] && mapUrl[1])) {
+        logService.log({ message: 'mapUrl is undefined', code: constants.codes.error })
+    } else {
+        request({ url: `${mapUrl[0]}${address}${mapUrl[1]}`, json: true }, (err, res) => {
+            if (err) {
+                logService.log({ message: err, code: constants.codes.error })
+            } else {
+                const place = {
+                    longitude: res.body.features[0].center[0],
+                    latitude: res.body.features[0].center[1]
+                }
+                callback(forecastUrl, place)
             }
-            callback(place)
-        }
-    })
+        })
+    }
 }
 
 // gets the weather for given coordinates
-const getWeather = (coordinates) => {
-    request({ url: weatherUrl[0] + coordinates.latitude + weatherUrl[1] + coordinates.longitude + weatherUrl[2], json: true }, (err, res) => {
-        if (err) {
-            console.log(err)
-        } else {
-            console.log(`The weather is ${res.body.current.weather[0].main}`)
-        }
-    })
+const getWeather = (forecastUrl, coordinates) => {
+    if (!(forecastUrl && forecastUrl[0] && forecastUrl[1] && forecastUrl[2])) {
+        logService.log({ message: 'forecastUrl is undefined', code: constants.codes.error })
+    } else {
+        request({ url: `${forecastUrl[0]}${coordinates.latitude}${forecastUrl[1]}${coordinates.longitude}${forecastUrl[2]}`, json: true }, (err, res) => {
+            if (err) {
+                logService.log({ message: err, code: constants.codes.error })
+            } else {
+                logService.log({ message: `The weather is ${res.body.current.weather[0].main}`, code: constants.codes.success })
+            }
+        })
+    }
 }
 
-weatherForecast('Lviv', getWeather)
+weatherForecast(mapboxUrl, weatherUrl, 'Lviv', getWeather)
