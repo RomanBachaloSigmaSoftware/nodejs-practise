@@ -11,9 +11,13 @@ const log = (logData) => {
   }
 };
 
-const error = (errorData) => {
+const error = (errorData, response) => {
   console.log(chalk.red(errorData));
-  throw errorData;
+
+  if (response)
+    response.send(errorData)
+  else
+    throw errorData;
 };
 
 module.exports = { log, error };

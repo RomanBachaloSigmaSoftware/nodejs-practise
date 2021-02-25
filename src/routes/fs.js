@@ -1,73 +1,93 @@
 const express = require('express');
-const logService = require('../log-service/logService');
 const fs = require('fs');
+const logService = require('../log-service/logService');
 
 const router = express.Router();
-const constants = require('../data/constants');
 
-router.delete('/:fileName', (req, res) => {
-  fs.exists(req.params.fileName, (exists) => {
-    if (exists) {
-      fs.unlink(req.params.fileName, (err) => {
-        if (err) {
-          res.statusCode = constants.codes.error;
-          res.send(`Unable to delete ${req.params.fileName}`);
-          logService.error(err);
-        } else {
-          res.send(`${req.params.fileName} deleted`);
-        }
-      });
-    } else {
-      res.statusCode = constants.codes.error;
-      res.send(`${req.params.fileName} does not exist`);
-    }
+async function get(name, response) {
+  const existsPromise = new Promise((resolve, reject) => {
+    fs.exists(name, (exists) => {
+      if (exists) resolve(name);
+
+      reject(`${name} does not exist`);
+    });
   });
-});
 
-router.post('/', (req, res) => {
+  existsPromise.then(() => fs.readFile(name, (error, data) => {
+    if (error) logService.error(error);
+
+    response.send(data);
+  })).catch((error) => logService.error(error, response));
+}
+
+async function deleteFile(name, response) {
+  const existsPromise = new Promise((resolve, reject) => {
+    fs.exists(name, (exists) => {
+      if (exists) resolve(name);
+
+      reject(`${name} does not exist`);
+    });
+  });
+
+  existsPromise.then(() => fs.unlink(name, (error) => {
+    if (error) logService.error(error);
+
+    response.send(`${name} deleted`);
+  })).catch((error) => logService.error(error, response));
+}
+
+async function createFile(name, content, response) {
+  const existsPromise = new Promise((resolve, reject) => {
+    fs.exists(name, (exists) => {
+      if (!exists) resolve({ name, content });
+
+      reject(`${name} already exists`);
+    });
+  });
+
+  existsPromise.then((file) => {
+    fs.writeFile(file.name, file.content, (err) => {
+      if (err) logService.error(err);
+
+      response.send(`${file.name} has been created`);
+    });
+  }).catch((error) => logService.error(error, response));
+}
+
+async function updateFile(name, content, response) {
+  const existsPromise = new Promise((resolve, reject) => {
+    fs.exists(name, (exists) => {
+      if (exists) resolve({ name, content });
+
+      reject(`${name} does not exist`);
+    });
+  });
+
+  existsPromise.then((file) => {
+    fs.writeFile(file.name, file.content, (err) => {
+      if (err) logService.error(err);
+
+      response.send(`${file.name} has been updated`);
+    });
+  }).catch((error) => logService.error(error, response));
+}
+
+router.get('/:fileName', async (req, res) => get(req.params.fileName, res));
+
+router.delete('/:fileName', async (req, res) => deleteFile(req.params.fileName, res));
+
+router.post('/', async (req, res) => {
   const documentValues = req.body;
   const file = `${documentValues.fileName}.${documentValues.fileExtension}`;
-  fs.exists(file, (exists) => {
-    if (exists) {
-      res.statusCode = constants.codes.error;
-      res.send(`${file} already exists`);
-    } else {
-      fs.writeFile(file, documentValues.fileContent, (err) => {
-        if (err) logService.error(err);
-        res.send(`${file} has been created`);
-      });
-    }
-  });
+
+  createFile(file, documentValues.fileContent, res);
 });
 
-router.put('/', (req, res) => {
+router.put('/', async (req, res) => {
   const documentValues = req.body;
   const file = `${documentValues.fileName}.${documentValues.fileExtension}`;
-  fs.exists(file, (exists) => {
-    if (exists) {
-      fs.writeFile(file, documentValues.fileContent, (err) => {
-        if (err) logService.error(err);
-        res.send(`${file} has been updated`);
-      });
-    } else {
-      res.statusCode = constants.codes.error;
-      res.send(`${file} does not exist`);
-    }
-  });
-});
 
-router.get('/:fileName', (req, res) => {
-  fs.exists(req.params.fileName, (exists) => {
-    if (exists) {
-      fs.readFile(req.params.fileName, (err, data) => {
-        if (err) logService.error(err);
-        res.send(data);
-      });
-    } else {
-      res.statusCode = constants.codes.error;
-      res.send(`${req.params.fileName} does not exist`);
-    }
-  });
+  updateFile(file, documentValues.fileContent, res);
 });
 
 module.exports = router;
