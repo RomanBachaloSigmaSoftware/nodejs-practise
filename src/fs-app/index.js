@@ -18,9 +18,9 @@ yargs.command({
     const url = baseUrl + argv.name;
     request({ url }, (err, res) => {
       if (err) {
-        logService.log({ message: err, code: constants.codes.error });
+        logService.error(err);
       } else if (res.statusCode >= constants.codes.error) {
-        logService.log({ message: res.body, code: constants.codes.error });
+        logService.error(res.body);
       } else {
         logService.log({ message: res.body, code: constants.codes.success });
       }
@@ -40,9 +40,9 @@ yargs.command({
     const url = baseUrl + argv.name;
     request.delete({ url }, (err, res) => {
       if (err) {
-        logService.log({ message: err, code: constants.codes.error });
+        logService.error(err);
       } else if (res.statusCode >= constants.codes.error) {
-        logService.log({ message: res.body, code: constants.codes.error });
+        logService.error(res.body);
       } else {
         logService.log({ message: res.body, code: constants.codes.success });
       }
@@ -69,9 +69,9 @@ yargs.command({
   handler(argv) {
     request.post({ url: baseUrl, body: argv, json: true }, (err, res) => {
       if (err) {
-        logService.log({ message: err, code: constants.codes.error });
+        logService.error(err);
       } else if (res.statusCode >= constants.codes.error) {
-        logService.log({ message: res.body, code: constants.codes.error });
+        logService.error(res.body);
       } else {
         logService.log({ message: res.body, code: constants.codes.success });
       }
@@ -98,9 +98,9 @@ yargs.command({
   handler(argv) {
     request.put({ url: baseUrl, body: argv, json: true }, (err, res) => {
       if (err) {
-        logService.log({ message: err, code: constants.codes.error });
+        logService.error(err);
       } else if (res.statusCode >= constants.codes.error) {
-        logService.log({ message: res.body, code: constants.codes.error });
+        logService.error(res.body);
       } else {
         logService.log({ message: res.body, code: constants.codes.success });
       }

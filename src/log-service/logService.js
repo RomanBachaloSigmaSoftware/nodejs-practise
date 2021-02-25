@@ -7,8 +7,13 @@ const log = (logData) => {
   } else if (logData.code < constants.codes.error) {
     console.log(chalk.green(logData.message));
   } else {
-    console.log(chalk.red(logData.message));
+    console.log(chalk.yellow(logData.message));
   }
 };
 
-module.exports = { log };
+const error = (errorData) => {
+  console.log(chalk.red(errorData));
+  throw errorData;
+};
+
+module.exports = { log, error };

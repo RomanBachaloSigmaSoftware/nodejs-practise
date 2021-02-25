@@ -1,4 +1,5 @@
 const express = require('express');
+const logService = require('../log-service/logService');
 const fs = require('fs');
 
 const router = express.Router();
@@ -11,7 +12,7 @@ router.delete('/:fileName', (req, res) => {
         if (err) {
           res.statusCode = constants.codes.error;
           res.send(`Unable to delete ${req.params.fileName}`);
-          console.error(err);
+          logService.error(err);
         } else {
           res.send(`${req.params.fileName} deleted`);
         }
@@ -32,7 +33,7 @@ router.post('/', (req, res) => {
       res.send(`${file} already exists`);
     } else {
       fs.writeFile(file, documentValues.fileContent, (err) => {
-        if (err) throw err;
+        if (err) logService.error(err);
         res.send(`${file} has been created`);
       });
     }
@@ -45,7 +46,7 @@ router.put('/', (req, res) => {
   fs.exists(file, (exists) => {
     if (exists) {
       fs.writeFile(file, documentValues.fileContent, (err) => {
-        if (err) throw err;
+        if (err) logService.error(err);
         res.send(`${file} has been updated`);
       });
     } else {
@@ -59,7 +60,7 @@ router.get('/:fileName', (req, res) => {
   fs.exists(req.params.fileName, (exists) => {
     if (exists) {
       fs.readFile(req.params.fileName, (err, data) => {
-        if (err) throw err;
+        if (err) logService.error(err);
         res.send(data);
       });
     } else {

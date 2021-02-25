@@ -16,7 +16,7 @@ const weatherUrl = [
 router.get('/:lat/:lon', (req, res) => {
   request({ url: `${weatherUrl[0]}${req.params.lat}${weatherUrl[1]}${req.params.lon}${weatherUrl[2]}`, json: true }, (error, response) => {
     if (error) {
-      logService.log({ message: error, code: constants.codes.error });
+      logService.error(error);
     } else {
       res.send(response.body.current);
     }
@@ -25,12 +25,12 @@ router.get('/:lat/:lon', (req, res) => {
 
 const forecastCallback = (error, response, res) => {
   if (error) {
-    logService.log({ message: error, code: constants.codes.error });
+    logService.error(error);
   } else {
     request({ url: `http://localhost:${port}/forecast/${response.body.latitude}/${response.body.longitude}`, json: true },
       (forecastError, forecastResponse) => {
         if (forecastError) {
-          logService.log({ message: forecastError, code: constants.codes.error });
+          logService.error(forecastError);
         } else {
           logService.log({
             message: JSON.stringify(forecastResponse.body),

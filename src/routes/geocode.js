@@ -12,15 +12,15 @@ const mapboxUrl = [
 
 router.get('/:place', (req, res) => {
   if (!(mapboxUrl && mapboxUrl[0] && mapboxUrl[1])) {
-    logService.log({ message: 'mapboxUrl is undefined', code: constants.codes.error });
+    logService.error('mapboxUrl is undefined');
   } else if (!req.params.place) {
-    logService.log({ message: 'place is undefined', code: constants.codes.error });
+    logService.error('place is undefined');
   } else {
     request({ url: `${mapboxUrl[0]}${req.params.place}${mapboxUrl[1]}`, json: true }, (error, response) => {
       if (error) {
-        logService.log({ message: error, code: constants.codes.error });
+        logService.error(error);
       } else if (!(response.body.features && response.body.features[0].center)) {
-        logService.log({ message: 'longitude and latitude are not available', code: constants.codes.error });
+        logService.error('longitude and latitude are not available');
       } else {
         res.send({
           longitude: response.body.features[0].center[0],
